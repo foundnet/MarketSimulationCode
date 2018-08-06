@@ -1,0 +1,21 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <time.h>
+
+#ifndef _HELPER_FUNCTIONS_H
+#define _HELPER_FUNCTIONS_H
+
+void initialiseRNG(long *);
+
+void squirrelStep(float, float, float *, float *, long *);
+
+int willGiveBirth(float, long *);
+
+int willCatchDisease(float, long *);
+
+int willDie(long *);
+
+int getCellFromPosition(float, float);
+
+#endif
