@@ -12,7 +12,12 @@ class BaseObject
 
 class Information : public BaseObject
 {
-    
+public:
+    int senderAgentID;
+    int receiverAgentID;
+    int msgType;
+    int bodyLength;
+    void *body;
 };
 
 class Product : public BaseObject
@@ -33,3 +38,4 @@ class Stock : public Product
 public:
 
 };
+

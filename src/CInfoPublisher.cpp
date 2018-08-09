@@ -1,6 +1,8 @@
 #include "CInfoPublisher.h"
 
-int InfoPublisher::PublishInfo(Information info, int publishMethod)
+Agent* clone(repast::Agent_id id) {return new InfoPublisher(id); }
+
+int InfoPublisher::PublishInfo(Information *info, int publishMethod)
 {
-    
+    broadcastInformation(info);
 }

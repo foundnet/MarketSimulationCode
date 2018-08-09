@@ -70,14 +70,10 @@ public:
 
 class RepastHPCDemoModel{
 	int stopAt;
-	int countOfAgents;
+	vector<int> agentTypes;
 	repast::Properties* props;
 	repast::SharedContext<RepastHPCDemoAgent> context;
 	
-	RepastHPCDemoAgentPackageProvider* provider;
-	RepastHPCDemoAgentPackageReceiver* receiver;
-
-	repast::SVDataSet* agentValues;
     repast::SharedDiscreteSpace<RepastHPCDemoAgent, repast::WrapAroundBorders, repast::SimpleAdder<RepastHPCDemoAgent> >* discreteSpace;
 	
 public:

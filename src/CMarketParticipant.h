@@ -6,7 +6,7 @@
 
 using namespace std;
 
-class MktParticipant : public BaseMktAgent {
+class MktParticipant : public Agent {
 public:
 //Properties
     string name;

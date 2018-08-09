@@ -5,7 +5,7 @@
 #include "ObjectClass.h"
 
 using namespace std;
-class InfoPublisher : public BaseMktAgent
+class InfoPublisher : public Agent
 {
 public:
 //Properties
@@ -15,6 +15,9 @@ public:
 //Actions
     //to do
     int PublishInfo(Information info, int publishMethod);
+    Agent* clone(repast::Agent_id id);
+    int runStep() = 0;
+
 
 };
 
