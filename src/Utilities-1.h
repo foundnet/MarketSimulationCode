@@ -80,7 +80,7 @@ typedef struct _MsgRoundBuf
 {
     int head;
     int tail;
-    Information info[AGENT_MSGQUEUE_LEN];
+    ActorMessage msg[ACTOR_MSGQUEUE_LEN];
 } MsgRoundBuf ;
 
 // Actor Structure

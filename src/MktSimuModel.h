@@ -1,7 +1,7 @@
 /* Demo_03_Model.h */
 
-#ifndef DEMO_03_MODEL
-#define DEMO_03_MODEL
+#ifndef MktSimuModel
+#define MktSimuModel
 
 #include <boost/mpi.hpp>
 #include "repast_hpc/Schedule.h"
@@ -13,7 +13,8 @@
 #include "repast_hpc/SharedDiscreteSpace.h"
 #include "repast_hpc/GridComponents.h"
 
-#include "Demo_03_Agent.h"
+#include "CommonTypes.h"
+#include "ObjectClass.h"
 
 /* Agent Package Provider */
 class RepastHPCDemoAgentPackageProvider {
@@ -68,8 +69,15 @@ public:
 	int getData();
 };
 
-class RepastHPCDemoModel{
+class MktSimuModel{
 	int stopAt;
+
+	MPI_Request privateRequest = NULL;
+	MPI_Request bcastRequest = NULL;
+
+	Information privateInfo;
+	Information bcastInfo;
+
 	vector<int> agentTypes;
 	repast::Properties* props;
 	repast::SharedContext<RepastHPCDemoAgent> context;
@@ -77,8 +85,8 @@ class RepastHPCDemoModel{
     repast::SharedDiscreteSpace<RepastHPCDemoAgent, repast::WrapAroundBorders, repast::SimpleAdder<RepastHPCDemoAgent> >* discreteSpace;
 	
 public:
-	RepastHPCDemoModel(std::string propsFile, int argc, char** argv, boost::mpi::communicator* comm);
-	~RepastHPCDemoModel();
+	MktSimuModel(std::string propsFile, int argc, char** argv, boost::mpi::communicator* comm);
+	~MktSimuModel();
 	void init();
 	void requestAgents();
 	void cancelAgentRequests();

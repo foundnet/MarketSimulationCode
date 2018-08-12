@@ -5,22 +5,26 @@
 using namespace std;
 
 
-class BaseObject
+struct BaseObject
 {
 
 };
 
-class Information : public BaseObject
+struct _MessageHead
 {
-public:
-    int senderAgentID;
-    int receiverAgentID;
+    repast::AgentId receiverID;
+    repast::AgentId senderID;
     int msgType;
     int bodyLength;
-    void *body;
-};
+} ;
 
-class Product : public BaseObject
+typedef struct _Information : BaseObject
+{
+    _MessageHead msgHead;
+    unsigned char body[MAX_MSG_LEN - sizeof(_MessageHead)];
+} Information;
+
+struct Product : BaseObject
 {
 public:
 //Properties

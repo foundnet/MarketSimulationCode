@@ -87,19 +87,7 @@ void MktSimuModel::initSchedule(repast::ScheduleRunner& runner){
 	
 }
 
-void MktSimuModel::recordResults(){
-	if(repast::RepastProcess::instance()->rank() == 0){
-		props->putProperty("Result","Passed");
-		std::vector<std::string> keyOrder;
-		keyOrder.push_back("RunNumber");
-		keyOrder.push_back("stop.at");
-		keyOrder.push_back("Result");
-		props->writeToSVFile("./output/results.csv", keyOrder);
-    }
-}
-
 int DispatchMessage()	{
-    Actor *pActor;
     if (repast::RepastProcess::instance()->rank() != 0) // If this is worker node
     {
             pActor = SearchActor(pMsg->rcvActorID);
@@ -122,60 +110,47 @@ int DispatchMessage()	{
     return 0;
 }
 
-int MessagePoll()
+int MktSimuModel::MessagePoll()
 {
     int flag;
     MPI_Status status;
 
-    LogMsg("Framework Poll",DEBUG,0);
+    if (privateRequest == NULL)
+        MPI_Irecv(&rcvInfo, MAX_MSG_LEN, MPI_UNSIGNED_CHAR, MPI_ANY_SOURCE, 0, comm, &privateRequest);
 
-    if (cntlRequest == NULL)
-        MPI_Irecv(&cntlMessage, 1, AF_CNTL_TYPE, MPI_ANY_SOURCE, AF_CONTROL_TAG, MPI_COMM_WORLD, &cntlRequest);
-   
-    MPI_Test(&cntlRequest, &flag, &status);
+    MPI_Test(&rcvInfo, &flag, &status);
     while (flag)
     {
-        LogMsg("Receive a control Msg",DEBUG,0);
-        if (!ProcessFrameworkMessage(handleGlobal.rank, &cntlMessage))
-            return 0;
         MPI_Irecv(&cntlMessage, 1, AF_CNTL_TYPE, MPI_ANY_SOURCE, AF_CONTROL_TAG, MPI_COMM_WORLD, &cntlRequest);
         MPI_Test(&cntlRequest, &flag, &status);
     }
 
     if (handleGlobal.rank != 0)
     {
-        if (cntlBcastRequest == NULL)
-            MPI_Ibcast(&cntlBcastMessage, 1, AF_CNTL_TYPE, 0, MPI_COMM_WORLD, &cntlBcastRequest);
+        if (bcastRequest == NULL)
+            MPI_Ibcast(&bcastInfo, MAX_MSG_LEN, MPI_UNSIGNED_CHAR, MPI_ANY_SOURCE, MPI_COMM_WORLD, &bcastRequest);
 
-        MPI_Test(&cntlBcastRequest, &flag, &status);
+        MPI_Test(&bcastRequest, &flag, &status);
         while (flag)
-        {
-            char info[100];
-            
-            LogMsg("Receive a bcast control Msg",DEBUG,0);
+        {            
+            memset(&bcastInfo, 0, sizeof(Information));
 
-            if (!ProcessFrameworkMessage(handleGlobal.rank, &cntlBcastMessage))
-                return 0;
-            memset(&cntlBcastMessage, 0, sizeof(FrameMessage));
-
-            MPI_Ibcast(&cntlBcastMessage, 1, AF_CNTL_TYPE, 0, MPI_COMM_WORLD, &cntlBcastRequest);
-            MPI_Test(&cntlBcastRequest, &flag, &status);
+            MPI_Ibcast(&bcastInfo, MAX_MSG_LEN, MPI_UNSIGNED_CHAR, 0, comm, &bcastRequest);
+            MPI_Test(&bcastRequest, &flag, &status);
         }
     }
 
-    if (actorRequest == NULL)
-        MPI_Irecv(&actorMessage, 1, AF_ACTOR_TYPE, MPI_ANY_SOURCE, AF_ACTORMSG_TAG, 
-                    MPI_COMM_WORLD, &actorRequest);
-    
-    MPI_Test(&actorRequest, &flag, &status);
+    if (privateRequest == NULL)
+        MPI_Irecv(&privateInfo, MAX_MSG_LEN, MPI_UNSIGNED_CHAR, MPI_ANY_SOURCE, 0, comm, &privateRequest);
+
+    MPI_Test(&privateRequest, &flag, &status);
+
     while (flag)
     {
-        LogMsg("Receive a actor Msg",DEBUG, 0);
-
-        DispatchActorMessage(handleGlobal.rank, &actorMessage);
-        MPI_Irecv(&actorMessage, 1, AF_ACTOR_TYPE, MPI_ANY_SOURCE, AF_CONTROL_TAG,
-                    MPI_COMM_WORLD, &actorRequest);
-        MPI_Test(&actorRequest, &flag, &status);
+        DispatchInformation(&rcvInfo);
+        memset(&rcvInfo, sizeof(rcvInfo), 0 );
+        MPI_Irecv(&rcvInfo, MAX_MSG_LEN, MPI_UNSIGNED_CHAR, MPI_ANY_SOURCE, 0, comm, &privateRequest);
+        MPI_Test(&privateRequest, &flag, &status);
     }
 
     return 1;

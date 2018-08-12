@@ -5,9 +5,18 @@
 #include <iostream>  
 #include <list>
 #include <map>
-#include<vector>
+#include <vector>
 
+#include "repast_hpc/AgentId.h"
+#include "repast_hpc/RepastProcess.h"
+#include "repast_hpc/RepastProcess.h"
+#include "repast_hpc/Utilities.h"
+#include "repast_hpc/Properties.h"
+#include "repast_hpc/initialize_random.h"
+#include "repast_hpc/SVDataSetBuilder.h"
+#include "repast_hpc/Point.h"
 
+#define MAX_MSG_LEN 256
 
 using namespace std;
 
