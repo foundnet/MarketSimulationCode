@@ -3,7 +3,37 @@
 #include <string.h>
 
 #include <boost/mpi.hpp>
-#include "pool.h"
+
+#include "ObjectClass.h"
+
+
+
+#define AGENT_MSGQUEUE_LEN 100
+typedef struct _MsgRoundBuf
+{
+    int head;
+    int tail;
+    Information info[AGENT_MSGQUEUE_LEN];
+    int pushInfo(Information *info) 
+    {
+        int point = (head + 1) % AGENT_MSGQUEUE_LEN;
+        if (point != tail)
+        {
+            info[point] = *info;
+            head = point;  
+            return 1;
+        }
+        else return 0;
+    };
+
+} MsgRoundBuf ;
+
+
+
+
+
+
+
 
 //---------------------------------------------------------------------------
 // Macros
@@ -12,7 +42,6 @@
 #define MAX_ACTOR_CNT 200
 #define MAX_ACTOR_TYPES 10
 #define MAX_NODE_CNT 100
-#define ACTOR_MSGQUEUE_LEN 100
 #define MSECOND_PER_LOOP  1
 
 #define AF_CONTROL_TAG 10000
@@ -76,12 +105,7 @@ typedef struct _ActorMessage
 } ActorMessage ;
  
 // Actor Message Round Buffer
-typedef struct _MsgRoundBuf
-{
-    int head;
-    int tail;
-    Information info[AGENT_MSGQUEUE_LEN];
-} MsgRoundBuf ;
+
 
 // Actor Structure
 typedef struct _Actor Actor;

@@ -1,7 +1,6 @@
-/* Demo_03_Model.h */
 
-#ifndef MktSimuModel
-#define MktSimuModel
+#ifndef MKTSIMUMODEL
+#define MKTSIMUMODEL
 
 #include <boost/mpi.hpp>
 #include "repast_hpc/Schedule.h"
@@ -15,6 +14,7 @@
 
 #include "CommonTypes.h"
 #include "ObjectClass.h"
+#include "CAgent.h"
 
 /* Agent Package Provider */
 class RepastHPCDemoAgentPackageProvider {
@@ -70,8 +70,12 @@ public:
 };
 
 class MktSimuModel{
-	int stopAt;
 
+	MktSimuModel(string propsFile, int argc, char** argv, boost::mpi::communicator* comm);
+	~MktSimuModel();
+public:
+	int stopAt;
+	int startX, startY, lengthX, lengthY;
 	MPI_Request privateRequest = NULL;
 	MPI_Request bcastRequest = NULL;
 
@@ -80,20 +84,16 @@ class MktSimuModel{
 
 	vector<int> agentTypes;
 	repast::Properties* props;
-	repast::SharedContext<RepastHPCDemoAgent> context;
+	repast::SharedContext<BaseAgent> context;
 	
-    repast::SharedDiscreteSpace<RepastHPCDemoAgent, repast::WrapAroundBorders, repast::SimpleAdder<RepastHPCDemoAgent> >* discreteSpace;
+    repast::SharedDiscreteSpace<BaseAgent, repast::WrapAroundBorders, repast::SimpleAdder<BaseAgent>>* discreteSpace;
 	
-public:
-	MktSimuModel(std::string propsFile, int argc, char** argv, boost::mpi::communicator* comm);
-	~MktSimuModel();
-	void init();
-	void requestAgents();
-	void cancelAgentRequests();
-	void removeLocalAgents();
-	void doSomething();
-	void initSchedule(repast::ScheduleRunner& runner);
-	void recordResults();
+	int DispatchInformation(Information *info);
+	int MessagePoll();
+	void initAgents(BaseAgent *agentPtr, repast::Properties* agentProps);
+	void runStep();
+
+
 };
 
 #endif

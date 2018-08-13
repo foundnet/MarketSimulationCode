@@ -5,7 +5,7 @@
 #include "ObjectClass.h"
 
 using namespace std;
-class InfoPublisher : public Agent
+class InfoPublisher : public BaseAgent
 {
 public:
 //Properties
@@ -15,7 +15,7 @@ public:
 //Actions
     //to do
     int PublishInfo(Information info, int publishMethod);
-    Agent* clone(repast::Agent_id id);
+    virtual BaseAgent* clone(repast::AgentId id, repast::Properties* agentProps) = 0;
     int runStep() = 0;
 
 

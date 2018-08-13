@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include "CommonTypes.h"
+#include "CMarketMaker.h"
 
 using namespace std;
 
@@ -24,22 +25,34 @@ typedef struct _Information : BaseObject
     unsigned char body[MAX_MSG_LEN - sizeof(_MessageHead)];
 } Information;
 
-struct Product : BaseObject
+class Product : BaseObject
 {
 public:
 //Properties
     int productID;
     string productName;
     int productType;
+    MarketMaker* market;
 //Actions
-    int MatchOrder(Order order);
-    int SendPrivateInfo(Information info);
-    int GetMktdata(MarketInfo mktdata);
+    Product(MarketMaker* mkt, int pID, string pName,int pType):market(mkt),productID(pID),productName(pName),productType(pType){};
+    virtual int matchOrder(Order order) = 0;
+    virtual int sendTrades(repast::AgentId id, Trade trade);
+    virtual int getMarketData(MarketInfo mktdata);
 };
 
 class Stock : public Product
 {
-public:
+private:
+    OrderBook ordBook;
+    MarketInfo mktInfo;
+    list<int> groups;
 
+    Stock(MarketMaker* mkt);
+    ~Stock();
+
+public:
+    int matchOrder(Order order);
+    int sendTrades(repast::AgentId id, Trade trade);
+    MarketInfo *getMarketData();
 };
 

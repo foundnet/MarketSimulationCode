@@ -6,6 +6,7 @@
 #include <list>
 #include <map>
 #include <vector>
+#include <sys/time.h>
 
 #include "repast_hpc/AgentId.h"
 #include "repast_hpc/RepastProcess.h"
@@ -22,7 +23,7 @@ using namespace std;
 
 typedef struct _Order {
     int orderNumber;
-    int ParticipantID;
+    repast::AgentId agentID;
     bool direction;             //Buy or Sell
     float price;
     int orderType;
@@ -33,7 +34,8 @@ typedef struct _Order {
 
 typedef struct _Trade {
     int orderNumber;
-    int counterPartyID;         //The ID of the counterParty
+    repast::AgentId counterPartyID;
+;   //The ID of the counterParty
     bool direction;             //Buy or Sell
     float tradePrice;           
     int count;                  //The count of trade
@@ -57,6 +59,7 @@ typedef struct _MarketInfo {
     timeval lastTradeTime;
     long volume;
     double turnover;
+    int updateTimes = 0;
 } MarketInfo;
 
 typedef struct _OrderList {

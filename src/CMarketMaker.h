@@ -1,18 +1,21 @@
+#ifndef MARKETMAKER
+#define MARKETMAKER
+
 #include "CommonTypes.h"
 #include "CAgent.h"
 
-class MarketMaker : public BaseMktAgent {
+class MarketMaker : public BaseAgent {
 public:
-    MarketMaker(string cfgfile, int stockCount, int investorCount);
-    ~MarketMaker();
-    int InputOrders(Order *pOrder,int cnt);
-    int productCount;
-    
-    MarketInfo market;
-    OrderBook *orderbook;
-    
-    
-private:
-    int exchangeStatus=0;       //0-Before Start  1-Trading  2-Post Trade
+    MarketMaker(string cfgfile, int productCount);
+    virtual ~MarketMaker();
 
+    int productCount;
+
+    list<Product> productList;
+    list<MarketInfo> mktdataList;
+    
+    virtual BaseAgent* clone(repast::AgentId id, repast::Properties* agentProps);
+    int processOrder(Order *order);
 };
+
+#endif
