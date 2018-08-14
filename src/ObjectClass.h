@@ -34,7 +34,7 @@ public:
     string productType;
     MarketMaker* market;
 //Actions
-    Product(MarketMaker* mkt, int pID, string pName,string pType):market(mkt),productID(pID),productName(pName),productType(pType){};
+    Product(MarketMaker* mkt):market(mkt){};
     virtual int matchOrder(Order order) = 0;
     virtual int sendTrades(repast::AgentId id, Trade trade);
     virtual int getMarketData(MarketInfo mktdata);
