@@ -2,14 +2,16 @@
 
 MarketMaker::MarketMaker(repast::AgentId id, repast::Properties* agentProps):BaseAgent(id)
 {
- 	int stopAt = repast::strToInt(agentProps->getProperty("stop.at"));
-   stockCnt = stockCount;
-
-    ifstream file(cfgfile,ios::in|ios::binary);  
+ 	marketName = agentProps->getProperty("market.name");
+    string productPropsFile = agentProps->getProperty("market.product.file");
+    ifstream file(productPropsFile,ios::in|ios::binary);  
     for (int i=0; i<stockCnt;i++) {
         file.read((char *)&market[i], sizeof(MarketInfo));
     }
     file.close();
+
+     	string = repast::strToInt(agentProps->getProperty("stop.at"));
+
 }
 
 MarketMaker::~MarketMaker() {
@@ -27,6 +29,10 @@ int MarketMaker::InputOrders(Order *pOrder, int cnt) {
 BaseAgent* MarketMaker::clone(repast::AgentId id, repast::Properties* agentProps)
 {
     MarketMaker *maker = new MarketMaker(id, agentProps);
-    return &maker;
+    return maker;
+}
 
+int MarketMaker::runStep()
+{
+    return 0;
 }

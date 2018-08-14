@@ -7,6 +7,8 @@
 #include <map>
 #include <vector>
 #include <sys/time.h>
+#include <unordered_map>
+#include <iostream>
 
 #include "repast_hpc/AgentId.h"
 #include "repast_hpc/RepastProcess.h"

@@ -19,7 +19,7 @@ public:
     repast::AgentId & getId(){                   return id_;}
     virtual const repast::AgentId& getId() const {      return id_;    }
 	
-    virtual BaseAgent* clone(repast::AgentId id, repast::Properties* agentProps) = 0;
+    virtual BaseAgent* clone(repast::AgentId id, string agentPropsFile) = 0;
     virtual int init();
     virtual int runStep() = 0;
 

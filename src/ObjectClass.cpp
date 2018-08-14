@@ -1,7 +1,9 @@
 #include "ObjectClass.h"
 
-Stock::Stock(int stockID)
+Stock::Stock(int stockID, string stockProps)
 {
+    while (stockProps.find(',',)
+    string value = stockProps.substr(,))
     ordBook.stockID = stockID;
     ordBook.BuyList.clear();
     ordBook.SellList.clear();

@@ -6,15 +6,18 @@
 
 class MarketMaker : public BaseAgent {
 public:
-    MarketMaker(string cfgfile, int productCount);
-    virtual ~MarketMaker();
+    MarketMaker(repast::AgentId id, repast::Properties* agentProps);
+    ~MarketMaker();
 
     int productCount;
+    string marketName;
 
-    list<Product> productList;
+    unordered_map<Product*> products;
     list<MarketInfo> mktdataList;
     
     virtual BaseAgent* clone(repast::AgentId id, repast::Properties* agentProps);
+    virtual int runStep();
+
     int processOrder(Order *order);
 };
 

@@ -70,7 +70,6 @@ public:
 };
 
 class MktSimuModel{
-
 	MktSimuModel(string propsFile, int argc, char** argv, boost::mpi::communicator* comm);
 	~MktSimuModel();
 public:
@@ -92,8 +91,7 @@ public:
 	int MessagePoll();
 	void initAgents(BaseAgent *agentPtr, repast::Properties* agentProps);
 	void runStep();
-
-
+	void initSchedule(repast::ScheduleRunner& runner);
 };
 
 #endif

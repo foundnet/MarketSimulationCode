@@ -47,7 +47,7 @@ private:
     MarketInfo mktInfo;
     list<int> groups;
 
-    Stock(MarketMaker* mkt);
+    Stock(int stockID, string stockProps);
     ~Stock();
 
 public:
