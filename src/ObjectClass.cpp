@@ -1,13 +1,28 @@
 #include "ObjectClass.h"
 
-Stock::Stock(int stockID, string stockProps)
+Stock::Stock(MarketMaker *mkt, string stockPropsString)
 {
-    while (stockProps.find(',',)
-    string value = stockProps.substr(,))
-    ordBook.stockID = stockID;
-    ordBook.BuyList.clear();
-    ordBook.SellList.clear();
-    memset(&mktInfo, 0, sizeof(MarketInfo))
+     std::string stockPropsString;
+        istringstream iss(stockPropsString);
+        vector<string> params;
+        do
+        {
+            string subs;
+            iss >> subs;
+            params.push_back(subs);
+        } while (iss);
+        if (params.size() > 3)
+        {
+            productID = repast::strToInt(params[0]);
+            string productName = params[1];
+            string type = params[2];
+            string productType = params[3];
+
+            ordBook.stockID = productID;
+            ordBook.BuyList.clear();
+            ordBook.SellList.clear();
+            memset(&mktInfo, 0, sizeof(MarketInfo));
+        }
 }
 
 int Stock::matchOrder(Order order)
@@ -177,11 +192,17 @@ int Stock::matchOrder(Order order)
 
 int Stock::sendTrades(repast::AgentId id, Trade trade)
 {
-    market->sendPrivateInformation(id, (unsigned char*)trade, sizeof(Trade), 0);
+    market->sendPrivateInformation(id, (unsigned char*)&trade, sizeof(Trade), 0);
     //Todo: we can add the subscriber list, because someone would be interested in other's trades
 }
 
 MarketInfo *Stock::getMarketData()
 {
     return &mktInfo;
+}
+
+Product* Stock::clone(string productPropsString)
+{
+    Stock *stock = new Stock(productPropsString);
+    return (Product*)stock;
 }

@@ -7,7 +7,7 @@
 #include <map>
 #include <vector>
 #include <sys/time.h>
-#include <unordered_map>
+#include <map>
 #include <iostream>
 
 #include "repast_hpc/AgentId.h"
@@ -22,6 +22,9 @@
 #define MAX_MSG_LEN 256
 
 using namespace std;
+
+typedef enum _AgentType {   AGENT_MM,
+                            AGENT_} FrameMsgType;
 
 typedef struct _Order {
     int orderNumber;

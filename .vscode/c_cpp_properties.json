@@ -1,12 +1,12 @@
 {
     "configurations": [
         {
-            "name": "Mac",
+            "name": "PC",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/Users/foundnet/DevRoot/Devlibs/Boost/Boost_1.61/include/",
-                "/Users/foundnet/DevRoot/Devlibs/repast_hpc-2.2.0/include",
-                "/Users/foundnet/DevRoot/Devlibs/MPICH/include/"
+                "/home/foundnet/sfw/Boost/Boost_1.61/include/",
+                "/home/foundnet/sfw/repast_hpc-2.2.0/include/",
+                "/usr/include/mpi"
             ],
             "defines": [],
             "macFrameworkPath": [

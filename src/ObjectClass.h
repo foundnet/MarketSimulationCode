@@ -31,13 +31,14 @@ public:
 //Properties
     int productID;
     string productName;
-    int productType;
+    string productType;
     MarketMaker* market;
 //Actions
-    Product(MarketMaker* mkt, int pID, string pName,int pType):market(mkt),productID(pID),productName(pName),productType(pType){};
+    Product(MarketMaker* mkt, int pID, string pName,string pType):market(mkt),productID(pID),productName(pName),productType(pType){};
     virtual int matchOrder(Order order) = 0;
     virtual int sendTrades(repast::AgentId id, Trade trade);
     virtual int getMarketData(MarketInfo mktdata);
+    virtual Product* clone(string strProps) = 0;
 };
 
 class Stock : public Product
@@ -47,12 +48,14 @@ private:
     MarketInfo mktInfo;
     list<int> groups;
 
-    Stock(int stockID, string stockProps);
+    Stock(MarketMaker *mkt, string stockPropsString);
     ~Stock();
+    Product* clone(string productPropsString);
 
 public:
     int matchOrder(Order order);
     int sendTrades(repast::AgentId id, Trade trade);
     MarketInfo *getMarketData();
+    Product* clone(string productPropsString)
 };
 

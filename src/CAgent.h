@@ -19,12 +19,12 @@ public:
     repast::AgentId & getId(){                   return id_;}
     virtual const repast::AgentId& getId() const {      return id_;    }
 	
-    virtual BaseAgent* clone(repast::AgentId id, string agentPropsFile) = 0;
+    virtual BaseAgent* clone(repast::AgentId id, repast::Properties* agentProps) = 0;
     virtual int init();
     virtual int runStep() = 0;
 
     int broadcastInformation(void *buff, int len, int msgType, MPI_Comm groupComm);
     int sendPrivateInformation(repast::AgentId destAgentID, unsigned char *buff, int len, int msgType);
     int readInformationFromQueue(Information *info);
-
+    
 };

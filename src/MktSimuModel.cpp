@@ -50,7 +50,7 @@ MktSimuModel::~MktSimuModel(){
 
 int MktSimuModel::initAgents(BaseAgent *agentPtr, string agentPropsFile){
 
-    repast::Properties* agentProps = new repast::Properties(agentPropsFile, comm);
+    repast::Properties* agentProps = new repast::Properties(agentPropsFile, MPI_COMM_WORLD);
 
     if (agentProps == NULL)     return 0;
 

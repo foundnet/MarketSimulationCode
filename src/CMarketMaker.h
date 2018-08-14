@@ -11,14 +11,20 @@ public:
 
     int productCount;
     string marketName;
+    string productType;
+    string productPropsFile;
 
-    unordered_map<Product*> products;
+    unordered_map<int,Product*> productMap;
     list<MarketInfo> mktdataList;
     
     virtual BaseAgent* clone(repast::AgentId id, repast::Properties* agentProps);
+    virtual initProducts(Product *productPtr);
+
     virtual int runStep();
 
     int processOrder(Order *order);
+    int deleteProducts();
+
 };
 
 #endif

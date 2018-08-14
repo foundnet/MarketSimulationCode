@@ -87,6 +87,7 @@ typedef enum _FrameMsgType { FM_ActorNew,
                              FM_Close,
                              FM_Custom } FrameMsgType;
 
+
 // Actor Message Structure
 typedef struct _FrameMessage
 {
