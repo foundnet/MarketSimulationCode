@@ -193,7 +193,8 @@ void RepastHPCDemoModel::doSomething(){
 
 	if(repast::RepastProcess::instance()->rank() == whichRank){
 		std::cout << "LOCAL AGENTS:" << std::endl;
-		for(int r = 0; r < 4; r++){
+		for(int r = 0; r < 4; r+	runner.scheduleEvent(2, 1, repast::Schedule::FunctorPtr(new repast::MethodFunctor<RepastHPCDemoModel> (this, &RepastHPCDemoModel::doSomething)));
++){
 			for(int i = 0; i < 10; i++){
 				repast::AgentId toDisplay(i, r, 0);
 				RepastHPCDemoAgent* agent = context.getAgent(toDisplay);

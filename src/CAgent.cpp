@@ -1,16 +1,9 @@
 #include "CAgent.h"
 
-int BaseAgent::init()  
-{
-    return 1;
-}
-
-BaseAgent::BaseAgent(repast::AgentId id): id_(id){ }
-
 int BaseAgent::readInformationFromQueue(Information *info)   {
     if (msgQueue.tail != msgQueue.head)
     {
-        memcpy(info, &msgQueue.info[msgQueue.tail], sizeof(ActorMessage));
+        memcpy(info, &msgQueue.info[msgQueue.tail], sizeof(Information));
         int point = (msgQueue.tail + 1) % AGENT_MSGQUEUE_LEN;
         msgQueue.tail = point;
         return 1;
@@ -53,4 +46,21 @@ int BaseAgent::sendPrivateInformation(repast::AgentId destAgentID, unsigned char
     MPI_Bsend(&info, len + sizeof(_MessageHead), MPI_UNSIGNED_CHAR, destAgentID.currentRank(), 0, MPI_COMM_WORLD);
 
     return 1;
+}
+
+int BaseAgent::runStep()
+{
+    Information info;
+    
+    while (readInformationFromQueue(&info))
+        handleInformation(&info);
+    
+    handleStepWork();
+    return 1;
+}
+
+
+int BaseAgent::init(repast::SharedContext<BaseAgent> *ctx)
+{
+    context = ctx;
 }

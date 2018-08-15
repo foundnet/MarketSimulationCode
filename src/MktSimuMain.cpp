@@ -1,9 +1,6 @@
-/* Demo_03_Main.cpp */
 
-#include <boost/mpi.hpp>
-#include "repast_hpc/RepastProcess.h"
 
-#include "MktSimuModel.h"
+#include "FrameworkModel.h"
 
 
 int main(int argc, char** argv){
@@ -16,10 +13,11 @@ int main(int argc, char** argv){
 
 	repast::RepastProcess::init(configFile);
 	
-	MktSimuModel* model = new MktSimuModel(propsFile, argc, argv, &world);
+	
+	FrameworkModel* model = new FrameworkModel(propsFile, argc, argv, &world);
+
 	repast::ScheduleRunner& runner = repast::RepastProcess::instance()->getScheduleRunner();
 	
-	model->init();
 	model->initSchedule(runner);
 	
 	runner.run();

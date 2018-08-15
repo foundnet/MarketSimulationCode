@@ -1,23 +1,12 @@
-/* Demo_03_Model.cpp */
 
-#include <stdio.h>
-#include <vector>
-#include <boost/mpi.hpp>
-#include "repast_hpc/AgentId.h"
-#include "repast_hpc/RepastProcess.h"
-#include "repast_hpc/Utilities.h"
-#include "repast_hpc/Properties.h"
-#include "repast_hpc/initialize_random.h"
-#include "repast_hpc/SVDataSetBuilder.h"
-#include "repast_hpc/Point.h"
-
-#include "MktSimuModel.h"
+#include "FrameworkModel.h"
 
 using namespace std;
 
 
-MktSimuModel::MktSimuModel(string propsFile, int argc, char** argv, boost::mpi::communicator* comm): context(comm){
-	props = new repast::Properties(propsFile, argc, argv, comm);
+FrameworkModel::FrameworkModel(string propsFile, int argc, char** argv, boost::mpi::communicator* commWorld): context(commWorld){
+	props = new repast::Properties(propsFile, argc, argv, commWorld);
+    comm = commWorld;
 	stopAt = repast::strToInt(props->getProperty("stop.at"));
 	startX = repast::strToInt(props->getProperty("startX.of.map"));
 	startY = repast::strToInt(props->getProperty("startY.of.map"));
@@ -36,21 +25,18 @@ MktSimuModel::MktSimuModel(string propsFile, int argc, char** argv, boost::mpi::
     processDims.push_back(2);
     
     discreteSpace = new repast::SharedDiscreteSpace<BaseAgent, repast::WrapAroundBorders, repast::SimpleAdder<BaseAgent> >("AgentDiscreteSpace", gd, processDims, 2, comm);
-	
-    std::cout << "RANK " << repast::RepastProcess::instance()->rank() << " BOUNDS: " << discreteSpace->bounds().origin() << " " << discreteSpace->bounds().extents() << std::endl;
-    
+
    	context.addProjection(discreteSpace);
-	
 }
 
-MktSimuModel::~MktSimuModel(){
+FrameworkModel::~FrameworkModel(){
 	delete props;
 
 }
 
-int MktSimuModel::initAgents(BaseAgent *agentPtr, string agentPropsFile){
+int FrameworkModel::initAgents(BaseAgent *agentPtr, string agentPropsFile){
 
-    repast::Properties* agentProps = new repast::Properties(agentPropsFile, MPI_COMM_WORLD);
+    repast::Properties *agentProps = new repast::Properties(agentPropsFile, comm);
 
     if (agentProps == NULL)     return 0;
 
@@ -74,45 +60,41 @@ int MktSimuModel::initAgents(BaseAgent *agentPtr, string agentPropsFile){
 		repast::AgentId id(i, rank, agentType);
 		id.currentRank(rank);
 		BaseAgent* newAgent = agentPtr->clone(id, agentProps);
-        newAgent->init();
+        newAgent->init(&context);
 		context.addAgent(newAgent);
         discreteSpace->moveTo(id, initialLocation);
 	}
 }
 
 
-void MktSimuModel::runStep(){
-	int whichRank = 0;
-
+void FrameworkModel::runStep()
+{
 	vector<BaseAgent*> agents;
-	vector<int>::iterator it;
-	for(it=vec.begin();it!=vec.end();it++)	{
-		context.selectAgents(repast::SharedContext<BaseAgent>::LOCAL, agents);
-		vector<BaseAgent*>::iterator it = agents.begin();
-		while(it != agents.end())
-        {
-		    (*it)->runStep();
-			it++;
-		}
+    context.selectAgents(repast::SharedContext<BaseAgent>::LOCAL, agents);
+	vector<BaseAgent*>::iterator it = agents.begin();
+	while(it != agents.end())
+    {
+        (*it)->runStep();
+		it++;
 	}
 }
 
-void MktSimuModel::initSchedule(repast::ScheduleRunner& runner){
+void FrameworkModel::initSchedule(repast::ScheduleRunner& runner){
 	//Run the agents' process functions
-    runner.scheduleEvent(1, 1, repast::Schedule::FunctorPtr(new repast::MethodFunctor<MktSimuModel> (this, &MktSimuModel::runStep)));
+    runner.scheduleEvent(1, 1, repast::Schedule::FunctorPtr(new repast::MethodFunctor<FrameworkModel> (this, &FrameworkModel::runStep)));
+    runner.scheduleEvent(1, 0.3, repast::Schedule::FunctorPtr(new repast::MethodFunctor<FrameworkModel> (this, &FrameworkModel::MessagePoll)));
 
     //Run communication functions
-    runner.scheduleEvent(1, 0.3, repast::Schedule::FunctorPtr(new repast::MethodFunctor<MktSimuModel> (this, &MktSimuModel::MessagePoll)));
 
 	runner.scheduleStop(stopAt);
 	
 }
 
-int MktSimuModel::DispatchInformation(Information *info)	
+int FrameworkModel::DispatchInformation(Information *info)	
 {
     if (info->msgHead.senderID != info->msgHead.receiverID)
     {
-        BaseAgent *selAgent = context->getAgent(info->msgHead.receiverID);
+        BaseAgent *selAgent = context.getAgent(info->msgHead.receiverID);
         if (selAgent != NULL)
             selAgent->msgQueue.pushInfo(info);            
     }
@@ -135,7 +117,7 @@ int MktSimuModel::DispatchInformation(Information *info)
 }
 
 
-int MktSimuModel::MessagePoll()
+void FrameworkModel::MessagePoll()
 {
     int flag;
     MPI_Status status;
@@ -153,5 +135,4 @@ int MktSimuModel::MessagePoll()
         MPI_Test(&privateRequest, &flag, &status);
     }
 
-    return 1;
 }
