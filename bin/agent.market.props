@@ -1,0 +1,10 @@
+#Basic Properties
+agent.type = 2
+start.sequence = 1
+end.sequence = 1
+agent.group = 5
+position.X = 0
+position.Y = 0
+
+#Specific Property
+market.name = stock

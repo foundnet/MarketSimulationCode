@@ -14,8 +14,11 @@ public:
     MsgRoundBuf msgQueue;
     repast::SharedContext<BaseAgent> *context;
     
+    
 //Actions   
+    BaseAgent(){};
     BaseAgent(repast::AgentId id):id_(id){};
+
     virtual ~BaseAgent() {};
 
     repast::AgentId & getId(){   return id_;  }

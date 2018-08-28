@@ -23,6 +23,7 @@ public:
     vector<Trade>  pastTrades;
 
 //Actions
+    MktParticipant() {};
     ~MktParticipant();
     MktParticipant(repast::AgentId id, repast::Properties *agentProps);
 

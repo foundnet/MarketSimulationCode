@@ -1,0 +1,13 @@
+#Basic Properties
+agent.type = 1
+start.sequence = 1
+end.sequence = 100
+agent.group = 4
+position.X = 0
+position.Y = 0
+
+#Specific Property
+participant.category = 5
+participant.max_currency = 50000
+participant.min_currency = 100
+participant.holding.file = participant.holding

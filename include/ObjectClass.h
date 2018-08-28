@@ -16,11 +16,11 @@ public:
     string productName;
     string productType;
     MarketMaker* market;
+    
 //Actions
     Product(MarketMaker* mkt):market(mkt){};
-    virtual int matchOrder(Order order) = 0;
-    virtual int sendTrades(repast::AgentId id, Trade trade) {};
-    virtual int sendOrderConfirm(repast::AgentId id, OrderConfirm ordCnfm){};    
+    virtual int processOrder(Order order) = 0;
+    virtual int putTradeResult(repast::AgentId id, TradeResult trade) {};
     virtual MarketInfo *getMarketData(){};
     virtual Product* clone(MarketMaker *mkt, string strProps) = 0;
 };
@@ -31,17 +31,21 @@ private:
     OrderBook ordBook;
     MarketInfo mktInfo;
     list<int> groups;
-
+    list<TradeResult> trdResultList;
+ 
     Stock(MarketMaker *mkt, string stockPropsString);
     ~Stock();
+    
+    int putTradeResult(repast::AgentId id, TradeResult trade);
+ 
     Product* clone(MarketMaker *mkt, string productPropsString);
 
 public:
-    int matchOrder(Order order);
-    int sendTrades(repast::AgentId id, Trade trade);
-    int sendOrderConfirm(repast::AgentId id, OrderConfirm ordCnfm);    
+    int processOrder(Order order);
+    int putTradeResult(repast::AgentId id, TradeResult trade) {};
+    TradeResult *getTradeResult();
+    int contractChecker();
     MarketInfo *getMarketData();
-    
 };
 
 #endif

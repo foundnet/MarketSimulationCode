@@ -7,7 +7,7 @@ Stock::Stock(MarketMaker *mkt, string stockPropsString):Product(mkt)
     vector<string> params;
     do
     {
-        string subs;
+        string subs;           
         iss >> subs;
         params.push_back(subs);
     } while (iss);
@@ -24,34 +24,36 @@ Stock::Stock(MarketMaker *mkt, string stockPropsString):Product(mkt)
     }
 }
 
-int Stock::matchOrder(Order order)
+int Stock::processOrder(Order order)
 {
-    if (order.direction == true) //Buy order
+    if (order.direction    == true) //Buy order
     {
         if (!ordBook.SellList.empty())
         {
             while (order.count > 0 && ordBook.SellList.front().price <= order.price)
             {
-                Trade tradeActive, tradePassive;
+                TradeResult tradeActive, tradePassive;
                 int reduceCount = order.count > ordBook.SellList.front().orders.front().count ? ordBook.SellList.front().orders.front().count : order.count;
                 tradeActive.count = reduceCount;
                 tradeActive.direction = true;
                 tradeActive.counterPartyID = ordBook.SellList.front().orders.front().agentID;
-                tradeActive.rank = repast::RepastProcess::instance()->rank();
+                tradeActive.agentID = order.agentID;
+                tradeActive.marketRank = repast::RepastProcess::instance()->rank();
                 gettimeofday(&tradeActive.timeStamp, NULL);
                 tradeActive.orderNumber = order.orderNumber;
-                tradeActive.tradePrice = ordBook.SellList.front().price;
+                tradeActive.price = ordBook.SellList.front().price;
 
                 tradePassive.count = reduceCount;
                 tradePassive.direction = false;
                 tradePassive.counterPartyID = order.agentID;
-                tradePassive.rank = repast::RepastProcess::instance()->rank();
+                tradePassive.agentID = ordBook.SellList.front().orders.front().agentID;
+                tradePassive.marketRank = repast::RepastProcess::instance()->rank();
                 tradePassive.timeStamp = tradeActive.timeStamp;
                 tradePassive.orderNumber = ordBook.SellList.front().orders.front().orderNumber;
-                tradePassive.tradePrice = ordBook.SellList.front().price;
+                tradePassive.price = ordBook.SellList.front().price;
 
-                sendTrades(order.agentID, tradeActive);
-                sendTrades(ordBook.SellList.front().orders.front().agentID, tradePassive);
+                putTradeResult(order.agentID, tradeActive);
+                putTradeResult(ordBook.SellList.front().orders.front().agentID, tradePassive);
 
                 mktInfo.stockID = ordBook.stockID;
                 mktInfo.lastPrice = ordBook.SellList.front().price;
@@ -77,7 +79,7 @@ int Stock::matchOrder(Order order)
         }
         if (order.count > 0)
         {
-            OrderConfirm ordConfirm;
+            TradeResult trdResult;
             if (order.orderType == 0)
             {
                 bool isProcessed = false;
@@ -108,19 +110,19 @@ int Stock::matchOrder(Order order)
                     newList.orders.push_back(order);
                     ordBook.BuyList.push_back(newList);
                 }
-                ordConfirm.operation = 0;              //0-store in orderbook, 1-send back
+                trdResult.operation = 0;              //0-store in orderbook, 1-send back
             }
-            else ordConfirm.operation = 1; 
+            else trdResult.operation = 1; 
 
-            ordConfirm.orderNumber = order.orderNumber;
-            ordConfirm.agentID = order.agentID;
-            ordConfirm.direction = order.direction;             //Buy or Sell
-            ordConfirm.productID = order.productID;              //ProductID of a financial product
-            ordConfirm.price = order.price;
-            ordConfirm.restCount = order.count;
-            gettimeofday(&ordConfirm.timeStamp, NULL);
+            trdResult.orderNumber = order.orderNumber;
+            trdResult.counterPartyID = order.agentID;
+            trdResult.direction = order.direction;             //Buy or Sell
+            trdResult.productID = order.productID;              //ProductID of a financial product
+            trdResult.price = order.price;
+            trdResult.count = order.count;
+            gettimeofday(&trdResult.timeStamp, NULL);
 
-            sendOrderConfirm(ordConfirm.agentID, ordConfirm);
+            putTradeResult(trdResult.counterPartyID, trdResult);
         }
     }
     else //Sell order
@@ -129,28 +131,27 @@ int Stock::matchOrder(Order order)
         {
             while (order.count > 0 && ordBook.BuyList.front().price >= order.price)
             {
-                Trade tradeActive, tradePassive;
+                TradeResult tradeActive, tradePassive;
                 int reduceCount = order.count > ordBook.BuyList.front().orders.front().count ? ordBook.BuyList.front().orders.front().count : order.count;
                 tradeActive.count = reduceCount;
                 tradeActive.direction = false;
                 tradeActive.counterPartyID = ordBook.BuyList.front().orders.front().agentID;
-                tradeActive.rank = repast::RepastProcess::instance()->rank();
+                tradeActive.marketRank = repast::RepastProcess::instance()->rank();
                 gettimeofday(&tradeActive.timeStamp, NULL);
                 tradeActive.orderNumber = order.orderNumber;
-                tradeActive.rank = repast::RepastProcess::instance()->rank();
 
-                tradeActive.tradePrice = ordBook.BuyList.front().price;
+                tradeActive.price = ordBook.BuyList.front().price;
 
                 tradePassive.count = reduceCount;
                 tradePassive.direction = false;
                 tradePassive.counterPartyID = order.agentID;
-                tradePassive.rank = repast::RepastProcess::instance()->rank();
+                tradePassive.marketRank = repast::RepastProcess::instance()->rank();
                 tradePassive.timeStamp = tradeActive.timeStamp;
                 tradePassive.orderNumber = ordBook.BuyList.front().orders.front().orderNumber;
-                tradePassive.tradePrice = ordBook.BuyList.front().price;
+                tradePassive.price = ordBook.BuyList.front().price;
 
-                sendTrades(order.agentID, tradeActive);
-                sendTrades(ordBook.BuyList.front().orders.front().agentID, tradePassive);
+                putTradeResult(order.agentID, tradeActive);
+                putTradeResult(ordBook.BuyList.front().orders.front().agentID, tradePassive);
 
                 mktInfo.stockID = ordBook.stockID;
                 mktInfo.lastPrice = ordBook.BuyList.front().price;
@@ -176,7 +177,7 @@ int Stock::matchOrder(Order order)
         }
         if (order.count > 0)
         {
-            OrderConfirm ordConfirm;
+            TradeResult trdResult;
             if (order.orderType == 0)
             {
                 bool isProcessed = false;
@@ -208,35 +209,45 @@ int Stock::matchOrder(Order order)
                     ordBook.SellList.push_back(newList);
                 }
 
-                ordConfirm.operation = 0;              //0-store in orderbook, 1-send back
+                trdResult.operation = 0;              //0-store in orderbook, 1-send back
             }
-            else ordConfirm.operation = 1; 
+            else trdResult.operation = 1; 
 
-            ordConfirm.orderNumber = order.orderNumber;
-            ordConfirm.agentID = order.agentID;
-            ordConfirm.direction = order.direction;             //Buy or Sell
-            ordConfirm.productID = order.productID;              //ProductID of a financial product
-            ordConfirm.price = order.price;
-            ordConfirm.restCount = order.count;
-            gettimeofday(&ordConfirm.timeStamp, NULL);
+            trdResult.orderNumber = order.orderNumber;
+            trdResult.counterPartyID = order.agentID;
+            trdResult.direction = order.direction;             //Buy or Sell
+            trdResult.productID = order.productID;              //ProductID of a financial product
+            trdResult.price = order.price;
+            trdResult.count = order.count;
+            gettimeofday(&trdResult.timeStamp, NULL);
 
-            sendOrderConfirm(ordConfirm.agentID, ordConfirm);
+            putTradeResult(order.agentID, trdResult);
         }
     }
     return 1;
 }
 
-int Stock::sendOrderConfirm(repast::AgentId id, OrderConfirm ordCnfm)
+int Stock::putTradeResult(repast::AgentId id, TradeResult trade)
 {
-    market->sendPrivateInformation(id, (unsigned char *)&ordCnfm, sizeof(OrderConfirm), 2);
-    //Todo: we can add the subscriber list, because someone would be interested in other's trades
-}
-
-int Stock::sendTrades(repast::AgentId id, Trade trade)
-{
-    market->sendPrivateInformation(id, (unsigned char *)&trade, sizeof(Trade), 1);
+    trdResultList.push_back(trade);
     //Todo: we can add the subscriber list, because someone would be interested in other's orderconfirm
 }
+
+TradeResult *Stock::getTradeResult()
+{
+    if (!trdResultList.empty())
+    {
+        TradeResult *trade = new TradeResult();
+        *trade = trdResultList.front();
+        trdResultList.pop_front();
+        return trade;
+    }
+
+    return NULL;
+
+    //Todo: we can add the subscriber list, because someone would be interested in other's orderconfirm
+}
+
 
 MarketInfo *Stock::getMarketData()
 {

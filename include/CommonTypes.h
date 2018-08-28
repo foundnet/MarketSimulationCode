@@ -13,7 +13,6 @@
 #include <vector>
 #include <sys/time.h>
 #include <unordered_map>
-#include <bits/stl_pair.h>
 #include <iostream>
 #include <string>
 #include <stdio.h>
@@ -72,9 +71,10 @@ typedef struct _Order {
     timeval timeStamp;
 } Order;
 
+/*
 typedef struct _OrderConfirm {
     int orderNumber;
-    repast::AgentId agentID;
+    repast::AgentId agentID;    
     bool direction;             //Buy or Sell
     int productID;              //ProductID of a financial product
     float price;
@@ -82,18 +82,21 @@ typedef struct _OrderConfirm {
     int operation;              //0-store in orderbook, 1-send back
     timeval timeStamp;
 } OrderConfirm;
+*/
 
 typedef struct _Trade {
+    int resultType;             //0- Trade   1- OrderConfirm
     int orderNumber;
-    //The ID of the counterParty
+    repast::AgentId agentID;
     repast::AgentId counterPartyID;
     int productID;
     bool direction;             //Buy or Sell
-    float tradePrice;           
-    int count;                  //The count of trade
-    int rank;
+    float price;           
+    int count;                  //The count of trade or the rest of CrderConfirm
+    int operation;              //0-store in orderbook, 1-send back 
+    int marketRank;
     timeval timeStamp;
-} Trade;
+} TradeResult;
 
 
 typedef struct _investorInfo {
@@ -132,6 +135,21 @@ typedef struct _Holding {
     int holdingType;        //0-normal 
     timeval lastUpdateTime;
 } Holding;
+
+typedef struct _Contract {
+    int resultType;             //0- Trade   1- OrderConfirm
+    int orderNumber;
+    repast::AgentId agentID;
+    repast::AgentId counterPartyID;
+    int productID;
+    bool direction;             //Buy or Sell
+    float price;           
+    int count;                  //The count of trade or the rest of CrderConfirm
+    int operation;              //0-store in orderbook, 1-send back 
+    int marketRank;
+    timeval timeStamp;          //Contract Built Date
+} TradeResult;
+
 
 
 #define AGENT_MSGQUEUE_LEN 100

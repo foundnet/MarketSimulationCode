@@ -16,7 +16,9 @@ MktParticipant::MktParticipant(repast::AgentId id, repast::Properties *agentProp
     }
 
     string holdingFile = agentProps->getProperty("participant.holding.file");
-    
+
+   	std::cout << id.id << "    " << currency << repast::RepastProcess::instance()->rank() << std::endl;
+
     if (!holdingFile.empty())
     {
         ifstream file(holdingFile);
@@ -37,10 +39,16 @@ MktParticipant::MktParticipant(repast::AgentId id, repast::Properties *agentProp
                 {
                     Holding hold;
                     hold.productID = atoi(params[0].c_str());
-                    hold.count = atoi(params[1].c_str());
+                    int min = atoi(params[1].c_str());
+                    int max = atoi(params[2].c_str());
+                    if (min == max) 
+                        hold.count = min;
+                    else
+                        hold.count = repast::Random::instance()->nextDouble() * (max-min) + min;
                     hold.freezeCount = 0;
                     hold.holdingType = 0;
                     holdingMap[hold.productID] = hold;
+                   	std::cout << hold.productID << "/" << hold.count << repast::RepastProcess::instance()->rank() << std::endl;
                 }
             }
             file.close();

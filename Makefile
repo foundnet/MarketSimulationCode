@@ -17,5 +17,6 @@ $(OBJS) : %.o : %.cpp
 	$(MPICXX) $(REPAST_HPC_DEFINES) $(BOOST_INCLUDE) $(REPAST_HPC_INCLUDE) -I./include -c $(SRCS)
 
 $(TARGET) : $(OBJS)	
-	$(MPICXX) $(BOOST_LIB_DIR) $(REPAST_HPC_LIB_DIR) -o $(TARGET) ./*.o $(REPAST_HPC_LIB) $(BOOST_LIBS)
+	$(MPICXX) $(BOOST_LIB_DIR) $(REPAST_HPC_LIB_DIR) -L./lib -o $(TARGET) ./*.o $(REPAST_HPC_LIB) $(BOOST_LIBS) -ljsoncpp
 	@rm -f ./*.o
+

@@ -7,11 +7,11 @@ using namespace std;
 FrameworkModel::FrameworkModel(string propsFile, int argc, char** argv, boost::mpi::communicator* commWorld): context(commWorld){
 	props = new repast::Properties(propsFile, argc, argv, commWorld);
     comm = commWorld;
-	stopAt = repast::strToInt(props->getProperty("stop.at"));
-	startX = repast::strToInt(props->getProperty("startX.of.map"));
-	startY = repast::strToInt(props->getProperty("startY.of.map"));
-	lengthX = repast::strToInt(props->getProperty("lengthX.of.map"));
-	lengthY = repast::strToInt(props->getProperty("lengthY.of.map"));
+	stopAt = atoi(props->getProperty("stop.at").c_str());
+	startX = atoi(props->getProperty("startX.of.map").c_str());
+	startY = atoi(props->getProperty("startY.of.map").c_str());
+	lengthX = atoi(props->getProperty("lengthX.of.map").c_str());
+	lengthY = atoi(props->getProperty("lengthY.of.map").c_str());
 
 	initializeRandom(*props, comm);
 	
@@ -35,19 +35,23 @@ FrameworkModel::~FrameworkModel(){
 }
 
 int FrameworkModel::initAgents(BaseAgent *agentPtr, string agentPropsFile){
+   	std::cout << "F00000000000 " << repast::RepastProcess::instance()->rank() << std::endl;
 
     repast::Properties *agentProps = new repast::Properties(agentPropsFile, comm);
 
     if (agentProps == NULL)     return 0;
 
-	int agentType = repast::strToInt(props->getProperty("agent.type"));
-	int startSeq = repast::strToInt(props->getProperty("start.sequence"));
-	int endSeq = repast::strToInt(props->getProperty("end.sequence"));
-	int group = repast::strToInt(props->getProperty("agent.group"));
-	int posX = repast::strToInt(props->getProperty("position.X"));
-	int posY = repast::strToInt(props->getProperty("position.Y"));
+   	std::cout << "F111111111111 " << repast::RepastProcess::instance()->rank() << std::endl;
+
+	int agentType = atoi(props->getProperty("agent.type").c_str());
+	int startSeq = atoi(props->getProperty("start.sequence").c_str());
+	int endSeq =atoi(props->getProperty("end.sequence").c_str());
+	int group = atoi(props->getProperty("agent.group").c_str());
+	int posX = atoi(props->getProperty("position.X").c_str());
+	int posY = atoi(props->getProperty("position.Y").c_str());
     
 	int rank = repast::RepastProcess::instance()->rank();
+   	std::cout << "F222222222222 " << repast::RepastProcess::instance()->rank() << std::endl;
 
 	for(int i = startSeq; i <= endSeq; i++){
         if (posX + posY <= 0)

@@ -1,6 +1,7 @@
 
 
 #include "FrameworkModel.h"
+#include "CMarketParticipant.h"
 
 
 int main(int argc, char** argv){
@@ -13,13 +14,22 @@ int main(int argc, char** argv){
 
 	repast::RepastProcess::init(configFile);
 	
-	
+	std::cout << "0000000000000000 " << repast::RepastProcess::instance()->rank() << std::endl;
+
 	FrameworkModel* model = new FrameworkModel(propsFile, argc, argv, &world);
 
 	repast::ScheduleRunner& runner = repast::RepastProcess::instance()->getScheduleRunner();
 	
 	model->initSchedule(runner);
+
+	MktParticipant factory;
+
+	std::cout << "1111111111111 " << repast::RepastProcess::instance()->rank() << std::endl;
+	model->initAgents(&factory, "agent.participant.props");
+	std::cout << "2222222222222 " << repast::RepastProcess::instance()->rank() << std::endl;
 	
+	model->initAgents(&factory, "agent.maket.props");
+
 	runner.run();
 	
 	delete model;
