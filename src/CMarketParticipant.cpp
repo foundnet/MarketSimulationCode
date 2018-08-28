@@ -71,7 +71,7 @@ int MktParticipant::handleInformation(Information *info)
 {
     if (info->msgHead.msgType == 1)                 //If it's a trade
     {
-        Trade *trade = (Trade*)info->body;
+        TradeResult *trade = (TradeResult*)info->body;
         if (trade->direction)
             holdingMap[trade->productID].count = holdingMap[trade->productID].count + trade->count;
         else  
@@ -81,16 +81,16 @@ int MktParticipant::handleInformation(Information *info)
     }
     else if (info->msgHead.msgType == 2)             //If it's a orderConfirm
     {
-        OrderConfirm * ordCnfm = (OrderConfirm*)info->body;
+        TradeResult * ordCnfm = (TradeResult*)info->body;
         if (ordCnfm->operation == 1)
         {
             if (ordCnfm->direction)
             {
-                currency += ordCnfm->price * ordCnfm->restCount;
+                currency += ordCnfm->price * ordCnfm->count;
             }
             else
             {
-                holdingMap[ordCnfm->productID].count ==holdingMap[ordCnfm->productID].count + ordCnfm->restCount;
+                holdingMap[ordCnfm->productID].count ==holdingMap[ordCnfm->productID].count + ordCnfm->count;
             }
         } 
     }

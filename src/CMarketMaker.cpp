@@ -20,7 +20,7 @@ int MarketMaker::processOrder(Order *order)
         selProduct = productMap[order->productID];
         if (selProduct != NULL)
         {
-            selProduct->matchOrder(*order);
+            selProduct->processOrder(*order);
             mktdataMap[order->productID] = *(selProduct->getMarketData());
             return 1;
         }

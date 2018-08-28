@@ -20,7 +20,7 @@ public:
     unordered_map<int,MarketInfo> mktdataMap;
     unordered_map<int,Holding>  holdingMap;            //The holding info
 
-    vector<Trade>  pastTrades;
+    vector<TradeResult>  pastTrades;
 
 //Actions
     MktParticipant() {};

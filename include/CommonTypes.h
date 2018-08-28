@@ -137,7 +137,7 @@ typedef struct _Holding {
 } Holding;
 
 typedef struct _Contract {
-    int resultType;             //0- Trade   1- OrderConfirm
+    int resultType;             //1- Trade   2- OrderConfirm
     int orderNumber;
     repast::AgentId agentID;
     repast::AgentId counterPartyID;
