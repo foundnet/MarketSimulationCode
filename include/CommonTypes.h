@@ -35,9 +35,9 @@
 #include "repast_hpc/SharedDiscreteSpace.h"
 #include "repast_hpc/GridComponents.h"
 
+#include "json/json.h"
 
 
-struct Informaion;
 
 #define MAX_MSG_LEN 256
 
@@ -52,11 +52,11 @@ struct _MessageHead
     int bodyLength;
 } ;
 
-typedef struct _Information
+typedef struct _MessageInfo
 {
     _MessageHead msgHead;
-    unsigned char body[MAX_MSG_LEN - sizeof(_MessageHead)];
-} Information;
+    unsigned char information[MAX_MSG_LEN - sizeof(_MessageHead)];
+} MessageInfo;
 
 
 typedef struct _Order {
@@ -148,7 +148,7 @@ typedef struct _Contract {
     int operation;              //0-store in orderbook, 1-send back 
     int marketRank;
     timeval timeStamp;          //Contract Built Date
-} TradeResult;
+} Contract;
 
 
 
@@ -157,8 +157,8 @@ typedef struct _MsgRoundBuf
 {
     int head;
     int tail;
-    Information info[AGENT_MSGQUEUE_LEN];
-    int pushInfo(Information *info) 
+    MessageInfo info[AGENT_MSGQUEUE_LEN];
+    int pushInfo(MessageInfo *info) 
     {
         int point = (head + 1) % AGENT_MSGQUEUE_LEN;
         if (point != tail)

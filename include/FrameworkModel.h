@@ -17,8 +17,8 @@ public:
 	MPI_Request bcastRequest = NULL;
 	boost::mpi::communicator *comm;
 
-	Information privateInfo;
-	Information bcastInfo;
+	MessageInfo privateInfo;
+	MessageInfo bcastInfo;
 
 	vector<int> agentTypes;
 	repast::Properties* props;
@@ -26,7 +26,7 @@ public:
 	
     repast::SharedDiscreteSpace<BaseAgent, repast::WrapAroundBorders, repast::SimpleAdder<BaseAgent>>* discreteSpace;
 	
-	int DispatchInformation(Information *info);
+	int DispatchMessageInfo(MessageInfo *info);
 	void MessagePoll();
 	int initAgents(BaseAgent *agentPtr, string agentPropsFile);
 	void runStep();

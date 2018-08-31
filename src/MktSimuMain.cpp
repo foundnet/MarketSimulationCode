@@ -1,6 +1,7 @@
 
 
 #include "FrameworkModel.h"
+#include "CMarketMaker.h"
 #include "CMarketParticipant.h"
 
 
@@ -28,9 +29,10 @@ int main(int argc, char** argv){
 	model->initAgents(&factory, "agent.participant.props");
 	std::cout << "2222222222222 " << repast::RepastProcess::instance()->rank() << std::endl;
 	
-	model->initAgents(&factory, "agent.maket.props");
+	MarketMaker maker;
+	model->initAgents(&maker, "agent.market.props");
 
-	runner.run();
+
 	
 	delete model;
 	

@@ -12,6 +12,8 @@ public:
 
     int group;
     MsgRoundBuf msgQueue;
+    map<string, map<double, string>> paramTable;
+
     repast::SharedContext<BaseAgent> *context;
     
     
@@ -27,12 +29,12 @@ public:
     virtual BaseAgent* clone(repast::AgentId id, repast::Properties* agentProps) = 0;
     virtual int init(repast::SharedContext<BaseAgent> *ctx);
     virtual int runStep();
-    virtual int handleInformation(Information *info) = 0;
+    virtual int MessageProcessor(MessageInfo *info);
     virtual int handleStepWork() = 0;
 
-    int broadcastInformation(void *buff, int len, int msgType, MPI_Comm groupComm);
-    int sendPrivateInformation(repast::AgentId destAgentID, unsigned char *buff, int len, int msgType);
-    int readInformationFromQueue(Information *info);
+    int broadcastMessageInfo(void *buff, int len, int msgType, MPI_Comm groupComm);
+    int sendPrivateMessageInfo(repast::AgentId destAgentID, unsigned char *buff, int len, int msgType);
+    int readMessageInfoFromQueue(MessageInfo *info);
     
 };
 

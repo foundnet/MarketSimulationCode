@@ -1,9 +1,9 @@
 #include "CAgent.h"
 
-int BaseAgent::readInformationFromQueue(Information *info)   {
+int BaseAgent::readMessageInfoFromQueue(MessageInfo *info)   {
     if (msgQueue.tail != msgQueue.head)
     {
-        memcpy(info, &msgQueue.info[msgQueue.tail], sizeof(Information));
+        memcpy(info, &msgQueue.info[msgQueue.tail], sizeof(MessageInfo));
         int point = (msgQueue.tail + 1) % AGENT_MSGQUEUE_LEN;
         msgQueue.tail = point;
         return 1;
@@ -11,11 +11,11 @@ int BaseAgent::readInformationFromQueue(Information *info)   {
     return 0;
 }
 
-int BaseAgent::broadcastInformation(void *buff, int len, int msgType, MPI_Comm groupComm)
+int BaseAgent::broadcastMessageInfo(void *buff, int len, int msgType, MPI_Comm groupComm)
 {
     if (len > (MAX_MSG_LEN-sizeof(_MessageHead)) || len < 1)  return 0;    
 
-    Information info;
+    MessageInfo info;
     info.msgHead.senderID = id_;
     info.msgHead.receiverID = id_;
     info.msgHead.msgType = msgType;
@@ -32,10 +32,10 @@ int BaseAgent::broadcastInformation(void *buff, int len, int msgType, MPI_Comm g
     return 1;
 }
 
-int BaseAgent::sendPrivateInformation(repast::AgentId destAgentID, unsigned char *buff, int len, int msgType) {
+int BaseAgent::sendPrivateMessageInfo(repast::AgentId destAgentID, unsigned char *buff, int len, int msgType) {
     if (len > (MAX_MSG_LEN-sizeof(_MessageHead)) || len < 1)  return 0;    
  
-    Information info;
+    MessageInfo info;
     info.msgHead.senderID = id_;
     info.msgHead.receiverID = destAgentID;
     info.msgHead.msgType = msgType;
@@ -50,10 +50,10 @@ int BaseAgent::sendPrivateInformation(repast::AgentId destAgentID, unsigned char
 
 int BaseAgent::runStep()
 {
-    Information info;
+    MessageInfo info;
     
-    while (readInformationFromQueue(&info))
-        handleInformation(&info);
+    while (readMessageInfoFromQueue(&info))
+        MessageProcessor(&info);
     
     handleStepWork();
     return 1;
@@ -64,3 +64,26 @@ int BaseAgent::init(repast::SharedContext<BaseAgent> *ctx)
 {
     context = ctx;
 }
+
+int BaseAgent::MessageProcessor(MessageInfo *info)
+{
+    Json::Value root;
+    Json::Reader reader;
+
+    string strJson = (const char*)info->information;
+
+    if (reader.parse(strJson, root))
+    {
+        double curTick = repast::RepastProcess::instance()->getScheduleRunner().currentTick();
+        for (int i=0; i<root.size(); i++)
+        {
+            vector<string> vNames = root.getMemberNames();
+            for (int i = 0; i<vNames.size(); i++)
+            {
+                paramTable[vNames[i]][curTick] = root[vNames[i]].asString();
+            }  
+        }
+    }
+
+}
+

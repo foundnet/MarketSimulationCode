@@ -22,7 +22,7 @@ BaseAgent* InfoReceiver::clone(repast::AgentId id, repast::Properties* agentProp
     return receiver;
 }
 
-int InfoReceiver::handleInformation(Information *info)
+int InfoReceiver::MessageProcessor(MessageInfo *info)
 {
     return 1;
 }

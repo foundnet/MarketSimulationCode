@@ -1,11 +1,18 @@
 #include "CMarketMaker.h"
 
 
+MarketMaker::MarketMaker()
+{
+ 
+}
+
 MarketMaker::MarketMaker(repast::AgentId id, repast::Properties *agentProps) : BaseAgent(id)
 {
     marketName = agentProps->getProperty("market.name");
-    productPropsFile = agentProps->getProperty("market.product.file");
+    productPropsFile = agentProps->getProperty("market.product.file")   ;
 }
+
+
 
 MarketMaker::~MarketMaker()
 {
@@ -21,6 +28,13 @@ int MarketMaker::processOrder(Order *order)
         if (selProduct != NULL)
         {
             selProduct->processOrder(*order);
+            TradeResult *trade;
+            while ((trade = selProduct->getTradeResult()) != NULL)
+            {
+                sendPrivateMessageInfo(trade->agentID, (unsigned char*)trade, sizeof(TradeResult), trade->resultType );
+              	std::cout << "Now send back a msg " << repast::RepastProcess::instance()->rank() << std::endl;
+
+            }
             mktdataMap[order->productID] = *(selProduct->getMarketData());
             return 1;
         }
@@ -34,7 +48,7 @@ BaseAgent* MarketMaker::clone(repast::AgentId id, repast::Properties *agentProps
     return maker;
 }
 
-int MarketMaker::handleInformation(Information *info)
+int MarketMaker::MessageProcessor(MessageInfo *info)
 {
     if (info->msgHead.msgType == 0)                 //If it's an order
     {
@@ -78,5 +92,5 @@ void MarketMaker::deleteProducts()
 
 int MarketMaker::bcastMarketInfo(MarketInfo *mktInfo)
 {
-    return broadcastInformation((void *)mktInfo, sizeof(MarketInfo), 2, MPI_COMM_WORLD);
+    return broadcastMessageInfo((void *)mktInfo, sizeof(MarketInfo), 2, MPI_COMM_WORLD);
 }

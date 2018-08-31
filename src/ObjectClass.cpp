@@ -35,6 +35,7 @@ int Stock::processOrder(Order order)
                 TradeResult tradeActive, tradePassive;
                 int reduceCount = order.count > ordBook.SellList.front().orders.front().count ? ordBook.SellList.front().orders.front().count : order.count;
                 tradeActive.count = reduceCount;
+                tradeActive.resultType = 1;
                 tradeActive.direction = true;
                 tradeActive.counterPartyID = ordBook.SellList.front().orders.front().agentID;
                 tradeActive.agentID = order.agentID;
@@ -47,6 +48,7 @@ int Stock::processOrder(Order order)
                 tradePassive.direction = false;
                 tradePassive.counterPartyID = order.agentID;
                 tradePassive.agentID = ordBook.SellList.front().orders.front().agentID;
+                tradePassive.resultType = 1;
                 tradePassive.marketRank = repast::RepastProcess::instance()->rank();
                 tradePassive.timeStamp = tradeActive.timeStamp;
                 tradePassive.orderNumber = ordBook.SellList.front().orders.front().orderNumber;
@@ -121,7 +123,7 @@ int Stock::processOrder(Order order)
             trdResult.price = order.price;
             trdResult.count = order.count;
             gettimeofday(&trdResult.timeStamp, NULL);
-
+            trdResult.resultType = 2;
             putTradeResult(trdResult.counterPartyID, trdResult);
         }
     }
@@ -135,6 +137,7 @@ int Stock::processOrder(Order order)
                 int reduceCount = order.count > ordBook.BuyList.front().orders.front().count ? ordBook.BuyList.front().orders.front().count : order.count;
                 tradeActive.count = reduceCount;
                 tradeActive.direction = false;
+                tradeActive.resultType = 1;
                 tradeActive.counterPartyID = ordBook.BuyList.front().orders.front().agentID;
                 tradeActive.marketRank = repast::RepastProcess::instance()->rank();
                 gettimeofday(&tradeActive.timeStamp, NULL);
@@ -145,6 +148,7 @@ int Stock::processOrder(Order order)
                 tradePassive.count = reduceCount;
                 tradePassive.direction = false;
                 tradePassive.counterPartyID = order.agentID;
+                tradePassive.resultType = 1;
                 tradePassive.marketRank = repast::RepastProcess::instance()->rank();
                 tradePassive.timeStamp = tradeActive.timeStamp;
                 tradePassive.orderNumber = ordBook.BuyList.front().orders.front().orderNumber;
@@ -219,6 +223,7 @@ int Stock::processOrder(Order order)
             trdResult.productID = order.productID;              //ProductID of a financial product
             trdResult.price = order.price;
             trdResult.count = order.count;
+            trdResult.resultType = 2;
             gettimeofday(&trdResult.timeStamp, NULL);
 
             putTradeResult(order.agentID, trdResult);

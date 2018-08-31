@@ -22,7 +22,7 @@ BaseAgent* InfoPublisher::clone(repast::AgentId id, repast::Properties* agentPro
     return publisher;
 }
 
-int InfoPublisher::handleInformation(Information *info)
+int InfoPublisher::MessageProcessor(MessageInfo *info)
 {
     return 1;
 }
@@ -37,13 +37,13 @@ int InfoPublisher::PublishInfo(void *buff, int len, int sendflag)
 {
     if (sendflag == -1)
     {
-        broadcastInformation(buff, len, sendflag, MPI_COMM_WORLD);
+        broadcastMessageInfo(buff, len, sendflag, MPI_COMM_WORLD);
     }
     else if (sendflag == -2)
     {
         for (int i = 0; i < pubGroups.size(); i++)
         {
-            broadcastInformation(buff, len, pubGroups[i], MPI_COMM_WORLD);
+            broadcastMessageInfo(buff, len, pubGroups[i], MPI_COMM_WORLD);
         }
     }
     else
@@ -53,7 +53,7 @@ int InfoPublisher::PublishInfo(void *buff, int len, int sendflag)
         {
             if (sendflag == pubGroups[i])
             {
-                broadcastInformation(buff, len, pubGroups[i], MPI_COMM_WORLD);
+                broadcastMessageInfo(buff, len, pubGroups[i], MPI_COMM_WORLD);
             }
         }
 

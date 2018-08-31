@@ -7,6 +7,7 @@
 
 class MarketMaker : public BaseAgent {
 public:
+    MarketMaker();
     MarketMaker(repast::AgentId id, repast::Properties *agentProps);
     ~MarketMaker();
 
@@ -19,7 +20,7 @@ public:
     unordered_map<int,MarketInfo> mktdataMap;
     
     BaseAgent* clone(repast::AgentId id, repast::Properties* agentProps);
-    int handleInformation(Information *info);
+    int MessageProcessor(MessageInfo *info);
     int handleStepWork();
 
     int initProducts(Product *productPtr);

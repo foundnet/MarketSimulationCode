@@ -34,8 +34,8 @@ FrameworkModel::~FrameworkModel(){
 
 }
 
-int FrameworkModel::initAgents(BaseAgent *agentPtr, string agentPropsFile){
-   	std::cout << "F00000000000 " << repast::RepastProcess::instance()->rank() << std::endl;
+int FrameworkModel::initAgents(BaseAgent *agentPtr, string agentPropsFile)
+{
 
     repast::Properties *agentProps = new repast::Properties(agentPropsFile, comm);
 
@@ -51,7 +51,6 @@ int FrameworkModel::initAgents(BaseAgent *agentPtr, string agentPropsFile){
 	int posY = atoi(props->getProperty("position.Y").c_str());
     
 	int rank = repast::RepastProcess::instance()->rank();
-   	std::cout << "F222222222222 " << repast::RepastProcess::instance()->rank() << std::endl;
 
 	for(int i = startSeq; i <= endSeq; i++){
         if (posX + posY <= 0)
@@ -68,6 +67,7 @@ int FrameworkModel::initAgents(BaseAgent *agentPtr, string agentPropsFile){
 		context.addAgent(newAgent);
         discreteSpace->moveTo(id, initialLocation);
 	}
+
 }
 
 
@@ -94,7 +94,7 @@ void FrameworkModel::initSchedule(repast::ScheduleRunner& runner){
 	
 }
 
-int FrameworkModel::DispatchInformation(Information *info)	
+int FrameworkModel::DispatchMessageInfo(MessageInfo *info)	
 {
     if (info->msgHead.senderID != info->msgHead.receiverID)
     {
@@ -133,7 +133,7 @@ void FrameworkModel::MessagePoll()
 
     while (flag)
     {
-        DispatchInformation(&privateInfo);
+        DispatchMessageInfo(&privateInfo);
         memset(&privateInfo, sizeof(privateInfo), 0 );
         MPI_Irecv(&privateInfo, MAX_MSG_LEN, MPI_UNSIGNED_CHAR, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &privateRequest);
         MPI_Test(&privateRequest, &flag, &status);

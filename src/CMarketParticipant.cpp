@@ -17,7 +17,7 @@ MktParticipant::MktParticipant(repast::AgentId id, repast::Properties *agentProp
 
     string holdingFile = agentProps->getProperty("participant.holding.file");
 
-   	std::cout << id.id << "    " << currency << repast::RepastProcess::instance()->rank() << std::endl;
+   	std::cout << id.id() << "    " << currency << "   "<< repast::RepastProcess::instance()->rank() << std::endl;
 
     if (!holdingFile.empty())
     {
@@ -48,7 +48,7 @@ MktParticipant::MktParticipant(repast::AgentId id, repast::Properties *agentProp
                     hold.freezeCount = 0;
                     hold.holdingType = 0;
                     holdingMap[hold.productID] = hold;
-                   	std::cout << hold.productID << "/" << hold.count << repast::RepastProcess::instance()->rank() << std::endl;
+                   	std::cout << hold.productID << "/" << hold.count << "/"<< repast::RepastProcess::instance()->rank() << std::endl;
                 }
             }
             file.close();
@@ -67,7 +67,7 @@ BaseAgent* MktParticipant::clone(repast::AgentId id, repast::Properties* agentPr
     return participant;
 }
 
-int MktParticipant::handleInformation(Information *info)
+int MktParticipant::MessageProcessor(MessageInfo *info)
 {
     if (info->msgHead.msgType == 1)                 //If it's a trade
     {
@@ -90,7 +90,7 @@ int MktParticipant::handleInformation(Information *info)
             }
             else
             {
-                holdingMap[ordCnfm->productID].count ==holdingMap[ordCnfm->productID].count + ordCnfm->count;
+                holdingMap[ordCnfm->productID].count =holdingMap[ordCnfm->productID].count + ordCnfm->count;
             }
         } 
     }
@@ -99,7 +99,7 @@ int MktParticipant::handleInformation(Information *info)
         MarketInfo *mktInfo = (MarketInfo *)info->body;
         mktdataMap[mktInfo->stockID] = *(mktInfo);
     }
-    else return 0;
+    else return BaseAgent::MessageProcessor(info);
 
     return 1;
 }
@@ -107,6 +107,9 @@ int MktParticipant::handleInformation(Information *info)
 
 int MktParticipant::handleStepWork()
 {
+    conditionCheck();
+    actionExecuter();
+    expectationGenerator();
     
     return 1;
 }
@@ -122,7 +125,7 @@ int MktParticipant::sendOrders(Order *order)
     {
 	    if (markets[j]->productMap.count(order->productID) > 0)
         {
-            sendPrivateInformation(markets[j]->getId(), (unsigned char *)&order, sizeof(Order), 0);
+            sendPrivateMessageInfo(markets[j]->getId(), (unsigned char *)&order, sizeof(Order), 0);
             if (order->direction)
                 currency -= order->count * order->price;
             else 
@@ -135,12 +138,33 @@ int MktParticipant::sendOrders(Order *order)
     //Todo: we can add the subscriber list, because someone would be interested in other's trades
 }
 
-int MktParticipant::calculateExpectation(int productID)      
+int MktParticipant::conditionCheck()
 {
-    //To do: override it to customize the expectation calculation 
-    int expectedPrice = repast::Random::instance()->nextDouble()*100;
-
-    return expectedPrice;
+    map<string, Condition>::iterator iter = conditionMap.begin();
+    while (iter != conditionMap.end())
+    {
+        iter->second.curStatus = iter->second.conFunctionPtr(&paramTable, &paramTable);
+    }
+    return 1;
 }
 
+int MktParticipant::actionExecuter()
+{
+    list<Rule>::iterator iter = ruleTable.begin();
+    while (iter != ruleTable.end())
+    {
+        list<ConStatus>::iterator iterCon = iter->conditionSet.begin();
+        while (iterCon != iter->conditionSet.end())
+        {
+            if ( !conditionMap[iterCon->conName].curStatus)
+                break;
+        }
+        if (iterCon == iter->conditionSet.end()) iter->action(&paramTable, &paramTable);
+    }
+    return 1;
+}
 
+int MktParticipant::expectationGenerator()
+{
+    return 1;
+}

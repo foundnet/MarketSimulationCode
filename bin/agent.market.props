@@ -8,3 +8,6 @@ position.Y = 0
 
 #Specific Property
 market.name = stock
+market.product.file = market.products
+
+
