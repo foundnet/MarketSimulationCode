@@ -17,9 +17,9 @@ public:
     ~InfoPublisher(){};
 
     BaseAgent* clone(repast::AgentId id, repast::Properties* agentProps);
-    int MessageProcessor(MessageInfo *info);
+    int messageProcessor(MessageInfo *info);
     int handleStepWork();
-
+    int registerGroup();
     int PublishInfo(void *buff, int len, int sendflag);
 
 };

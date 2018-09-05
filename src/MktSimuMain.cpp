@@ -19,9 +19,7 @@ int main(int argc, char** argv){
 
 	FrameworkModel* model = new FrameworkModel(propsFile, argc, argv, &world);
 
-	repast::ScheduleRunner& runner = repast::RepastProcess::instance()->getScheduleRunner();
 	
-	model->initSchedule(runner);
 
 	MktParticipant factory;
 
@@ -31,9 +29,11 @@ int main(int argc, char** argv){
 	
 	MarketMaker maker;
 	model->initAgents(&maker, "agent.market.props");
+	std::cout << "33333333333333 " << repast::RepastProcess::instance()->rank() << std::endl;
 
+	model->runModel();
+	std::cout << "44444444444444 " << repast::RepastProcess::instance()->rank() << std::endl;
 
-	
 	delete model;
 	
 	repast::RepastProcess::instance()->done();

@@ -48,11 +48,11 @@ BaseAgent* MarketMaker::clone(repast::AgentId id, repast::Properties *agentProps
     return maker;
 }
 
-int MarketMaker::MessageProcessor(MessageInfo *info)
+int MarketMaker::messageProcessor(MessageInfo *info)
 {
     if (info->msgHead.msgType == 0)                 //If it's an order
     {
-        processOrder((Order *)&info->body[0]);
+        processOrder((Order *)&info->information[0]);
         return 1;
     }
     return 0;

@@ -67,11 +67,13 @@ BaseAgent* MktParticipant::clone(repast::AgentId id, repast::Properties* agentPr
     return participant;
 }
 
-int MktParticipant::MessageProcessor(MessageInfo *info)
+int MktParticipant::messageProcessor(MessageInfo *info)
 {
+  	std::cout << "MktParticipant:MsgProcessor id:" << id_.id() << " rank:" << repast::RepastProcess::instance()->rank() << std::endl;
+
     if (info->msgHead.msgType == 1)                 //If it's a trade
     {
-        TradeResult *trade = (TradeResult*)info->body;
+        TradeResult *trade = (TradeResult*)info->information;
         if (trade->direction)
             holdingMap[trade->productID].count = holdingMap[trade->productID].count + trade->count;
         else  
@@ -81,7 +83,7 @@ int MktParticipant::MessageProcessor(MessageInfo *info)
     }
     else if (info->msgHead.msgType == 2)             //If it's a orderConfirm
     {
-        TradeResult * ordCnfm = (TradeResult*)info->body;
+        TradeResult * ordCnfm = (TradeResult*)info->information;
         if (ordCnfm->operation == 1)
         {
             if (ordCnfm->direction)
@@ -96,10 +98,10 @@ int MktParticipant::MessageProcessor(MessageInfo *info)
     }
     else if (info->msgHead.msgType == 3)             //If it's a market info
     {
-        MarketInfo *mktInfo = (MarketInfo *)info->body;
+        MarketInfo *mktInfo = (MarketInfo *)info->information;
         mktdataMap[mktInfo->stockID] = *(mktInfo);
     }
-    else return BaseAgent::MessageProcessor(info);
+    else return BaseAgent::message2Param(info);
 
     return 1;
 }
@@ -110,7 +112,8 @@ int MktParticipant::handleStepWork()
     conditionCheck();
     actionExecuter();
     expectationGenerator();
-    
+    std::cout << "MktParticipant:handle id:" << id_.id() << " rank:" << repast::RepastProcess::instance()->rank() << std::endl;
+
     return 1;
 }
 
@@ -166,5 +169,6 @@ int MktParticipant::actionExecuter()
 
 int MktParticipant::expectationGenerator()
 {
+
     return 1;
 }

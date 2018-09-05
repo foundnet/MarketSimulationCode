@@ -14,6 +14,8 @@ InfoPublisher::InfoPublisher(repast::AgentId id, repast::Properties *agentProps)
         pubGroups.push_back(atoi(subs.c_str()));
 
     } while (iss);
+
+    registerGroup();
 }
 
 BaseAgent* InfoPublisher::clone(repast::AgentId id, repast::Properties* agentProps)
@@ -22,8 +24,9 @@ BaseAgent* InfoPublisher::clone(repast::AgentId id, repast::Properties* agentPro
     return publisher;
 }
 
-int InfoPublisher::MessageProcessor(MessageInfo *info)
+int InfoPublisher::messageProcessor(MessageInfo *info)
 {
+    
     return 1;
 }
 
@@ -60,5 +63,27 @@ int InfoPublisher::PublishInfo(void *buff, int len, int sendflag)
         if (i == pubGroups.size())     return 0;
     }
 
+    return 1;
+}
+
+int InfoPublisher::registerGroup()
+{
+    for (int i=0; i<pubGroups.size() ;i++)
+    {
+        map<int, GroupInfo>::iterator iter;
+        iter = model->groupMap.find(pubGroups[i]);
+        if (iter != model->groupMap.end())
+        {
+            iter->second.isPub = 1;
+            iter->second.members.push_back(id_);
+        }
+        else
+        {
+            GroupInfo grp;
+            grp.members.push_back(id_);
+            grp.isPub = true;
+            model->groupMap[pubGroups[i]] = grp;
+        }
+    }
     return 1;
 }

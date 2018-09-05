@@ -20,7 +20,7 @@ public:
     unordered_map<int,MarketInfo> mktdataMap;
     
     BaseAgent* clone(repast::AgentId id, repast::Properties* agentProps);
-    int MessageProcessor(MessageInfo *info);
+    int messageProcessor(MessageInfo *info);
     int handleStepWork();
 
     int initProducts(Product *productPtr);

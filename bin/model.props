@@ -1,5 +1,5 @@
 #Properties file
-stop.At = 1000
+stop.at = 1000
 startX.of.map = 1 
 startY.of.map = 1
 lengthX.of.map = 10000

@@ -1,5 +1,6 @@
 #include "CAgent.h"
 
+
 int BaseAgent::readMessageInfoFromQueue(MessageInfo *info)   {
     if (msgQueue.tail != msgQueue.head)
     {
@@ -20,7 +21,7 @@ int BaseAgent::broadcastMessageInfo(void *buff, int len, int msgType, MPI_Comm g
     info.msgHead.receiverID = id_;
     info.msgHead.msgType = msgType;
     info.msgHead.bodyLength = len;
-    memcpy(&info.body, buff, len);
+    memcpy(&info.information, buff, len);
 
     MPI_Request request;
 
@@ -40,7 +41,7 @@ int BaseAgent::sendPrivateMessageInfo(repast::AgentId destAgentID, unsigned char
     info.msgHead.receiverID = destAgentID;
     info.msgHead.msgType = msgType;
     info.msgHead.bodyLength = len;
-    memcpy(&info.body, buff, len);
+    memcpy(&info.information, buff, len);
 
     MPI_Request request;
     MPI_Bsend(&info, len + sizeof(_MessageHead), MPI_UNSIGNED_CHAR, destAgentID.currentRank(), 0, MPI_COMM_WORLD);
@@ -53,19 +54,21 @@ int BaseAgent::runStep()
     MessageInfo info;
     
     while (readMessageInfoFromQueue(&info))
-        MessageProcessor(&info);
+        messageProcessor(&info);
     
     handleStepWork();
     return 1;
 }
 
 
-int BaseAgent::init(repast::SharedContext<BaseAgent> *ctx)
+int BaseAgent::init(FrameworkModel *m)
 {
-    context = ctx;
+    context = &m->context;
+    model = m;
+  	std::cout << "BaseAgent:init id:" << id_.id() << " rank:" << repast::RepastProcess::instance()->rank() << std::endl;
 }
 
-int BaseAgent::MessageProcessor(MessageInfo *info)
+int BaseAgent::message2Param(MessageInfo *info)
 {
     Json::Value root;
     Json::Reader reader;
@@ -86,4 +89,3 @@ int BaseAgent::MessageProcessor(MessageInfo *info)
     }
 
 }
-

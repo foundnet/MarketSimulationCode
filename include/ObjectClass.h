@@ -11,7 +11,6 @@ using namespace std;
 class Product
 {
 private:
-    Product(MarketMaker* mkt):market(mkt){};
     virtual int putTradeResult(repast::AgentId id, TradeResult trade) {};
     
 
@@ -24,6 +23,7 @@ public:
     MarketMaker* market;
 
 //Actions
+    Product(MarketMaker* mkt):market(mkt){};
     virtual int processOrder(Order order) = 0;
     virtual MarketInfo *getMarketData() = 0;
     virtual TradeResult *getTradeResult() = 0;

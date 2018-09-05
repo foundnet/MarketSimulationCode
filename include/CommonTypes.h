@@ -40,6 +40,9 @@
 
 
 #define MAX_MSG_LEN 256
+#define AGENT_MSGQUEUE_LEN 100
+#define MAX_GROUP_CNT 500
+
 
 using namespace std;
 
@@ -151,12 +154,18 @@ typedef struct _Contract {
 } Contract;
 
 
+typedef struct _CommInfo
+{
+    int groupNum;
+    int pubRank;
+    MPI_Comm comm;
+    MPI_Request request;
+} CommInfo;
 
-#define AGENT_MSGQUEUE_LEN 100
 typedef struct _MsgRoundBuf
 {
-    int head;
-    int tail;
+    int head = 0;
+    int tail = 0;
     MessageInfo info[AGENT_MSGQUEUE_LEN];
     int pushInfo(MessageInfo *info) 
     {

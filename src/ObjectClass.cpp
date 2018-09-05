@@ -11,16 +11,17 @@ Stock::Stock(MarketMaker *mkt, string stockPropsString):Product(mkt)
         iss >> subs;
         params.push_back(subs);
     } while (iss);
-    if (params.size() > 2)
+    if (params.size() > 3)
     {
+        memset(&mktInfo, 0, sizeof(MarketInfo));
         productID = atoi(params[0].c_str());
         productName = params[1];
+        mktInfo.lastPrice = atof(params[3].c_str());
         productType = params[2];
-
+        mktInfo.stockID = productID;
         ordBook.stockID = productID;
         ordBook.BuyList.clear();
         ordBook.SellList.clear();
-        memset(&mktInfo, 0, sizeof(MarketInfo));
     }
 }
 
@@ -91,7 +92,6 @@ int Stock::processOrder(Order order)
                     {
                         if (iter->price > order.price)
                             continue;
-
                         if (iter->price == order.price)
                             iter->orders.push_back(order);
                         else if (iter->price < order.price)
@@ -115,7 +115,6 @@ int Stock::processOrder(Order order)
                 trdResult.operation = 0;              //0-store in orderbook, 1-send back
             }
             else trdResult.operation = 1; 
-
             trdResult.orderNumber = order.orderNumber;
             trdResult.counterPartyID = order.agentID;
             trdResult.direction = order.direction;             //Buy or Sell
@@ -127,7 +126,7 @@ int Stock::processOrder(Order order)
             putTradeResult(trdResult.counterPartyID, trdResult);
         }
     }
-    else //Sell order
+    else //Sell orderproductMap
     {
         if (!ordBook.BuyList.empty())
         {
@@ -142,9 +141,7 @@ int Stock::processOrder(Order order)
                 tradeActive.marketRank = repast::RepastProcess::instance()->rank();
                 gettimeofday(&tradeActive.timeStamp, NULL);
                 tradeActive.orderNumber = order.orderNumber;
-
                 tradeActive.price = ordBook.BuyList.front().price;
-
                 tradePassive.count = reduceCount;
                 tradePassive.direction = false;
                 tradePassive.counterPartyID = order.agentID;
@@ -153,10 +150,8 @@ int Stock::processOrder(Order order)
                 tradePassive.timeStamp = tradeActive.timeStamp;
                 tradePassive.orderNumber = ordBook.BuyList.front().orders.front().orderNumber;
                 tradePassive.price = ordBook.BuyList.front().price;
-
                 putTradeResult(order.agentID, tradeActive);
                 putTradeResult(ordBook.BuyList.front().orders.front().agentID, tradePassive);
-
                 mktInfo.stockID = ordBook.stockID;
                 mktInfo.lastPrice = ordBook.BuyList.front().price;
                 mktInfo.high = mktInfo.lastPrice > mktInfo.high ? mktInfo.lastPrice : mktInfo.high;
@@ -168,12 +163,10 @@ int Stock::processOrder(Order order)
                 mktInfo.volume += reduceCount;
                 mktInfo.turnover += reduceCount * mktInfo.lastPrice;
                 mktInfo.updateTimes++;
-
                 order.count -= reduceCount;
                 ordBook.BuyList.front().orders.front().count -= reduceCount;
                 if (ordBook.BuyList.front().orders.front().count == 0)
-                {
-                    ordBook.BuyList.front().orders.pop_front();
+                {   ordBook.BuyList.front().orders.pop_front();
                     if (ordBook.BuyList.front().orders.size() == 0)
                         ordBook.BuyList.pop_front();
                 }
@@ -263,4 +256,11 @@ Product *Stock::clone(MarketMaker *mkt, string productPropsString)
 {
     Stock *stock = new Stock(mkt, productPropsString);
     return (Product *)stock;
+}
+
+int Stock::contractChecker()
+{
+    //Update the dividends
+
+    return 1;
 }
